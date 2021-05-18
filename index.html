@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <title>Runner</title>
+  </head>
+  <body>
+    <style>
+      body {
+        align-items: center;
+        background-color: black;
+        overflow: hidden;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        max-height: 100vh;
+        height: 100vh;
+      }
+
+      body:hover {
+        cursor: none;
+      }
+
+      #boostBoard {
+        align-items: flex-end;
+        display: flex;
+        justify-content: space-between;
+        height: 600px;
+        width: 800px;
+      }
+
+      #boostBar {
+        border: 2px solid gray;
+        border-radius: 3px;
+        box-sizing: border-box;
+        height: 43px;
+        width: 104px;
+      }
+
+      #boostGauge {
+        background: green;
+        border-radius: 3px;
+        height: 40px;
+        width: 100px;
+      }
+
+      #boostAmount {
+        align-items: center;
+        display: flex;
+        height: 40px;
+        justify-content: center;
+        width: 104px;
+      }
+
+      #healthAmount {
+        align-items: center;
+        display: flex;
+        height: 40px;
+        justify-content: center;
+        width: 104px;
+      }
+    </style>
+    <div id="mainContainer">
+      <div id="boostBoard" class="fixed text-white ml-5 mt-5">
+        <div>
+          <span>BOOST</span>
+          <div id="boostBar" class="mt-5">
+            <div id="boostGauge">
+              <div id="boostAmount">100</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <span>HEALTH</span>
+          <div id="boostBar" class="mt-5">
+            <div id="boostGauge">
+              <div id="healthAmount">100</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <canvas tabindex="1" id="canvas"></canvas>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.1/gsap.min.js"></script>
+      <script src="index.js"></script>
+    </div>
+  </body>
+</html>
