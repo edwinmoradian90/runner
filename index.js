@@ -1,9 +1,22 @@
+"use strict";
+
 const canvas = document.querySelector("#canvas");
 const c = canvas.getContext("2d");
 const boostAmount = document.getElementById("boostAmount");
 const boostGauge = document.getElementById("boostGauge");
+const healthAmount = document.getElementById("healthAmount");
+const healthGauge = document.getElementById("healthGauge");
 
 const random = (min, max) => Math.floor(Math.random() * (max - min)) + min;
+
+function getRandomColor() {
+  var letters = "0123456789ABCDEF";
+  var color = "#";
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
 
 const gameMusic = new Audio();
 gameMusic.src = "./OutThere.ogg";
@@ -26,8 +39,10 @@ canvas.width = 800;
 canvas.height = 600;
 
 const RUN_VELOCITY = 7;
+const FRICTION = 0.92;
 let accelerator = 0;
 let boost = 100;
+let health = 100;
 let counter = 0;
 
 class Player {
@@ -115,6 +130,35 @@ class Asteroid {
   }
 }
 
+class Particle {
+  constructor(x, y, velocity, color) {
+    this.x = x;
+    this.y = y;
+    this.velocity = velocity;
+    this.color = color;
+    this.alpha = 1;
+  }
+
+  draw() {
+    c.save();
+    c.globalAlpha = this.alpha;
+    c.beginPath();
+    c.fillStyle = this.color || "white";
+    c.arc(this.x, this.y, random(0, 3), 0, 2 * Math.PI, false);
+    c.fill();
+    c.restore();
+  }
+
+  update() {
+    this.draw();
+    this.velocity.x *= FRICTION;
+    this.velocity.y *= FRICTION;
+    this.x += this.velocity.x;
+    this.y += this.velocity.y + accelerator;
+    this.alpha -= 0.01;
+  }
+}
+
 let keyPresses = {
   ArrowUp: false,
   ArrowDown: false,
@@ -126,6 +170,7 @@ let keyPresses = {
 let stars = [];
 let missiles = [];
 let asteroids = [];
+let particles = [];
 
 const player = new Player(
   canvas.width / 2,
@@ -214,6 +259,38 @@ function rechargeBoost() {
   }
 }
 
+function loseHealth() {
+  if (health <= 10) {
+    healthGauge.style.background = "red";
+    if (counter % 1 === 0) {
+      health -= 1;
+      healthAmount.innerHTML = health;
+      healthGauge.style.width = health + "px";
+    }
+  } else if (health < 25) {
+    healthGauge.style.background = "orange";
+    if (counter % 1 === 0) {
+      health -= 1;
+      healthAmount.innerHTML = health;
+      healthGauge.style.width = health + "px";
+    }
+  } else if (health < 50) {
+    healthGauge.style.background = "yellow";
+    if (counter % 2 === 0) {
+      health -= 1;
+      healthAmount.innerHTML = health;
+      healthGauge.style.width = health + "px";
+    }
+  } else if (health <= 100) {
+    healthGauge.style.background = "green";
+    if (counter % 2 === 0) {
+      health -= 1;
+      healthAmount.innerHTML = health;
+      healthGauge.style.width = health + "px";
+    }
+  }
+}
+
 function movePlayer() {
   stopPlayer();
   if (keyPresses["ArrowLeft"]) {
@@ -237,9 +314,9 @@ function movePlayer() {
     }
   }
 }
-
+let starInterval;
 function createStars() {
-  setInterval(() => {
+  starInterval = setInterval(() => {
     const star = new Star(
       Math.random() * canvas.width,
       50,
@@ -249,18 +326,31 @@ function createStars() {
     );
     star.draw();
     stars.push(star);
-  }, 50);
+  }, 100);
 }
 
 let animationId;
 
+function endGame() {
+  cancelAnimationFrame(animationId);
+  clearInterval(starInterval);
+}
+
 function animate() {
+  if (health === 0) return endGame();
   counter += 1;
   c.fillStyle = "rgba( 0, 0, 0, 0.7)";
   c.fillRect(0, 0, canvas.width, canvas.height);
   player.update();
   movePlayer();
   rechargeBoost();
+  particles.forEach((particle, index) => {
+    if (particle.alpha <= 0) {
+      particles.splice(index, 1);
+    } else {
+      particle.update();
+    }
+  });
   missiles.forEach((missile) => {
     missile.update();
   });
@@ -275,6 +365,18 @@ function animate() {
     }
   });
   asteroids.forEach((asteroid, index) => {
+    const playerMeteorDist = Math.hypot(
+      player.x - asteroid.x,
+      player.y - asteroid.y
+    );
+    if (playerMeteorDist - asteroid.height < 1) {
+      gsap.to(asteroid, {
+        height: asteroid.height - 2,
+        width: asteroid.width - 2,
+      });
+      loseHealth();
+    }
+
     asteroid.update();
     missiles.forEach((missile, missileIndex) => {
       const dist = Math.hypot(missile.x - asteroid.x, missile.y - asteroid.y);
@@ -283,6 +385,19 @@ function animate() {
           missiles.splice(missileIndex, 1);
           if (asteroid.height < 70) {
             asteroids.splice(index, 1);
+            for (let i = 0; i < asteroid.height / 2; i++) {
+              particles.push(
+                new Particle(
+                  asteroid.x + asteroid.width / 2,
+                  asteroid.y + asteroid.height / 2,
+                  {
+                    x: (Math.random() - 0.5) * (Math.random() * 13),
+                    y: (Math.random() - 0.5) * (Math.random() * 13),
+                  },
+                  getRandomColor()
+                )
+              );
+            }
           } else {
             gsap.to(asteroid, {
               height: asteroid.height - 20,
