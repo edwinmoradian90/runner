@@ -35,10 +35,13 @@ missile.src = "./beams.png";
 const asteroidBig = new Image();
 asteroidBig.src = "./asteriod-big.png";
 
+const collisionSound = new Audio();
+collisionSound.src = "./flaunch.wav";
+
 canvas.width = 800;
 canvas.height = 600;
 
-const RUN_VELOCITY = 7;
+const RUN_VELOCITY = 5;
 const FRICTION = 0.92;
 let accelerator = 0;
 let boost = 100;
@@ -263,28 +266,32 @@ function loseHealth() {
   if (health <= 10) {
     healthGauge.style.background = "red";
     if (counter % 1 === 0) {
-      health -= 1;
+      if (health - 4 < 0) {
+        health = 0;
+      } else {
+        health -= 4;
+      }
       healthAmount.innerHTML = health;
       healthGauge.style.width = health + "px";
     }
   } else if (health < 25) {
     healthGauge.style.background = "orange";
     if (counter % 1 === 0) {
-      health -= 1;
+      health -= 3;
       healthAmount.innerHTML = health;
       healthGauge.style.width = health + "px";
     }
   } else if (health < 50) {
     healthGauge.style.background = "yellow";
     if (counter % 2 === 0) {
-      health -= 1;
+      health -= 2;
       healthAmount.innerHTML = health;
       healthGauge.style.width = health + "px";
     }
   } else if (health <= 100) {
     healthGauge.style.background = "green";
     if (counter % 2 === 0) {
-      health -= 1;
+      health -= 2;
       healthAmount.innerHTML = health;
       healthGauge.style.width = health + "px";
     }
@@ -295,12 +302,12 @@ function movePlayer() {
   stopPlayer();
   if (keyPresses["ArrowLeft"]) {
     player.velocity.x =
-      player.x - player.width > 0 ? -RUN_VELOCITY - accelerator : 0;
+      player.x - player.width > 0 ? -RUN_VELOCITY - accelerator / 4 : 0;
   }
   if (keyPresses["ArrowRight"]) {
     player.velocity.x =
       player.x + player.height * 2 < canvas.width
-        ? RUN_VELOCITY + accelerator
+        ? RUN_VELOCITY + accelerator / 4
         : 0;
   }
   if (keyPresses["ArrowUp"]) {
@@ -309,7 +316,7 @@ function movePlayer() {
     } else {
       accelerator > 0 ? (accelerator -= 5) : 0;
     }
-    if (accelerator > 3 && boost > 0) {
+    if (accelerator > 7 && boost > 0) {
       useBoost();
     }
   }
@@ -337,7 +344,7 @@ function endGame() {
 }
 
 function animate() {
-  if (health === 0) return endGame();
+  if (health <= 0) return endGame();
   counter += 1;
   c.fillStyle = "rgba( 0, 0, 0, 0.7)";
   c.fillRect(0, 0, canvas.width, canvas.height);
@@ -370,10 +377,10 @@ function animate() {
       player.y - asteroid.y
     );
     if (playerMeteorDist - asteroid.height < 1) {
-      gsap.to(asteroid, {
-        height: asteroid.height - 2,
-        width: asteroid.width - 2,
-      });
+      collisionSound.currentTime = 0;
+      collisionSound.play();
+      asteroid.velocity.x = player.velocity.x;
+      asteroid.velocity.y = player.velocity.y - FRICTION - accelerator;
       loseHealth();
     }
 
@@ -384,6 +391,10 @@ function animate() {
         setTimeout(() => {
           missiles.splice(missileIndex, 1);
           if (asteroid.height < 70) {
+            const asteroidExplosionSound = new Audio();
+            asteroidExplosionSound.src = "./iceball.wav";
+            asteroidExplosionSound.currentTime = 0;
+            asteroidExplosionSound.play();
             asteroids.splice(index, 1);
             for (let i = 0; i < asteroid.height / 2; i++) {
               particles.push(
