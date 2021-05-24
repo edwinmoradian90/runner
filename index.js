@@ -6,6 +6,7 @@ const boostAmount = document.getElementById("boostAmount");
 const boostGauge = document.getElementById("boostGauge");
 const healthAmount = document.getElementById("healthAmount");
 const healthGauge = document.getElementById("healthGauge");
+const score = document.getElementById("score");
 
 const random = (min, max) => Math.floor(Math.random() * (max - min)) + min;
 
@@ -29,14 +30,23 @@ missileFx.src = "./laser4.wav";
 const ship = new Image();
 ship.src = "./Fighter3.png";
 
+const heart = new Image();
+heart.src = "./heart.png";
+
 const missile = new Image();
 missile.src = "./beams.png";
+
+const rapidFireBeams = new Image();
+rapidFireBeams.src = "./beamRapid.png";
 
 const asteroidBig = new Image();
 asteroidBig.src = "./asteriod-big.png";
 
 const collisionSound = new Audio();
 collisionSound.src = "./flaunch.wav";
+
+const errorSound = new Audio();
+errorSound.src = "./error.ogg";
 
 canvas.width = 800;
 canvas.height = 600;
@@ -46,6 +56,7 @@ const FRICTION = 0.92;
 let accelerator = 0;
 let boost = 100;
 let health = 100;
+let currentScore = 0;
 let counter = 0;
 
 class Player {
@@ -94,21 +105,46 @@ class Star {
 }
 
 class Missile {
-  constructor(x, y, velocity) {
+  constructor(x, y, velocity, type = "primary") {
     this.x = x;
     this.y = y;
     this.velocity = velocity;
+    this.type = type;
   }
 
   draw() {
     c.beginPath();
-    c.drawImage(missile, this.x, this.y, 10, 40);
+    c.drawImage(
+      this.type === "primary" ? missile : rapidFireBeams,
+      this.x,
+      this.y,
+      10,
+      40
+    );
   }
 
   update() {
     this.draw();
     this.x += this.velocity.x;
     this.y += this.velocity.y;
+  }
+}
+
+class Heart {
+  constructor(x, y, type) {
+    this.x = x;
+    this.y = y;
+    this.type = type;
+    this.healthGiven = 50;
+  }
+
+  draw() {
+    c.beginPath();
+    c.drawImage(heart, this.x, this.y);
+  }
+
+  update() {
+    this.draw();
   }
 }
 
@@ -168,6 +204,7 @@ let keyPresses = {
   ArrowLeft: false,
   ArrowRight: false,
   z: false,
+  x: false,
 };
 
 let stars = [];
@@ -315,6 +352,8 @@ function movePlayer() {
       accelerator += 1;
     } else {
       accelerator > 0 ? (accelerator -= 5) : 0;
+      errorSound.currentTime = 0;
+      errorSound.play();
     }
     if (accelerator > 7 && boost > 0) {
       useBoost();
@@ -341,6 +380,11 @@ let animationId;
 function endGame() {
   cancelAnimationFrame(animationId);
   clearInterval(starInterval);
+}
+
+function addToScore(asteroidHeight) {
+  currentScore += Math.floor(10 + asteroidHeight / 2);
+  score.innerHTML = currentScore;
 }
 
 function animate() {
@@ -372,11 +416,11 @@ function animate() {
     }
   });
   asteroids.forEach((asteroid, index) => {
-    const playerMeteorDist = Math.hypot(
+    const playerAstroDist = Math.hypot(
       player.x - asteroid.x,
       player.y - asteroid.y
     );
-    if (playerMeteorDist - asteroid.height < 1) {
+    if (playerAstroDist - asteroid.height < 1) {
       collisionSound.currentTime = 0;
       collisionSound.play();
       asteroid.velocity.x = player.velocity.x;
@@ -396,6 +440,7 @@ function animate() {
             asteroidExplosionSound.currentTime = 0;
             asteroidExplosionSound.play();
             asteroids.splice(index, 1);
+            addToScore(asteroid.height);
             for (let i = 0; i < asteroid.height / 2; i++) {
               particles.push(
                 new Particle(
@@ -410,10 +455,16 @@ function animate() {
               );
             }
           } else {
-            gsap.to(asteroid, {
-              height: asteroid.height - 20,
-              width: asteroid.width - 20,
-            });
+            if (missile.type === "primary") {
+              gsap.to(asteroid, {
+                height: asteroid.height - 20,
+                width: asteroid.width - 20,
+              });
+            } else {
+              const newHeart = new Heart(asteroid.x, asteroid.y, "mega");
+              asteroids.splice(index, 1);
+              newHeart.update();
+            }
           }
         }, 0);
       }
@@ -439,7 +490,9 @@ const engineSound = new Audio();
 engineSound.src = "./engine1.wav";
 addEventListener("keydown", (e) => {
   if (e.key === "z") {
-    missiles.push(new Missile(player.x + 12, player.y - 20, { x: 0, y: -40 }));
+    missiles.push(
+      new Missile(player.x + 10, player.y - 20, { x: 0, y: -40 }, "primary")
+    );
     const missileFx = new Audio();
     missileFx.src = "./laser4.wav";
     missileFx.currentTime = 0;
@@ -447,6 +500,15 @@ addEventListener("keydown", (e) => {
   }
   if (e.key === "ArrowUp" && boost > 0) {
     engineSound.play();
+  }
+  if (e.key === "x") {
+    missiles.push(
+      new Missile(player.x + 10, player.y - 20, { x: 0, y: -40 }, "secondary")
+    );
+    const rapidFireBeamFx = new Audio();
+    rapidFireBeamFx.src = "./burstFire.mp3";
+    rapidFireBeamFx.currentTime = 0;
+    rapidFireBeamFx.play();
   }
   keyPresses[e.key] = true;
 });
