@@ -20,33 +20,33 @@ function getRandomColor() {
 }
 
 const gameMusic = new Audio();
-gameMusic.src = "./OutThere.ogg";
+gameMusic.src = "./assets/music/OutThere.ogg";
 gameMusic.loop = true;
 gameMusic.play();
 
 const missileFx = new Audio();
-missileFx.src = "./laser4.wav";
+missileFx.src = "./assets/sfx/laser4.wav";
 
 const ship = new Image();
-ship.src = "./Fighter3.png";
+ship.src = "./assets/sprites/Fighter3.png";
 
 const heart = new Image();
-heart.src = "./heart.png";
+heart.src = "./assets/sprites/heart.png";
 
 const missile = new Image();
-missile.src = "./beams.png";
+missile.src = "./assets/sprites/beams.png";
 
 const rapidFireBeams = new Image();
-rapidFireBeams.src = "./beamRapid.png";
+rapidFireBeams.src = "./assets/sprites/beamRapid.png";
 
 const asteroidBig = new Image();
-asteroidBig.src = "./asteriod-big.png";
+asteroidBig.src = "./assets/sprites/asteriod-big.png";
 
 const collisionSound = new Audio();
-collisionSound.src = "./flaunch.wav";
+collisionSound.src = "./assets/sfx/flaunch.wav";
 
 const errorSound = new Audio();
-errorSound.src = "./error.ogg";
+errorSound.src = "./assets/sfx/error.ogg";
 
 canvas.width = 800;
 canvas.height = 600;
@@ -487,14 +487,14 @@ function animate() {
 }
 
 const engineSound = new Audio();
-engineSound.src = "./engine1.wav";
+engineSound.src = "./assets/sfx/engine1.wav";
 addEventListener("keydown", (e) => {
   if (e.key === "z") {
     missiles.push(
       new Missile(player.x + 10, player.y - 20, { x: 0, y: -40 }, "primary")
     );
     const missileFx = new Audio();
-    missileFx.src = "./laser4.wav";
+    missileFx.src = "./assets/sfx/laser4.wav";
     missileFx.currentTime = 0;
     missileFx.play();
   }
@@ -506,7 +506,7 @@ addEventListener("keydown", (e) => {
       new Missile(player.x + 10, player.y - 20, { x: 0, y: -40 }, "secondary")
     );
     const rapidFireBeamFx = new Audio();
-    rapidFireBeamFx.src = "./burstFire.mp3";
+    rapidFireBeamFx.src = "./assets/sfx/burstFire.mp3";
     rapidFireBeamFx.currentTime = 0;
     rapidFireBeamFx.play();
   }
