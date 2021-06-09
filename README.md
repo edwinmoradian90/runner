@@ -6,6 +6,8 @@
 
 A space shooter built with JavaScript! Just float around and shoot the asteroids.
 
+No game over yet.
+
 ## Controls
 
 **Movement** Left and right arrow keys.
