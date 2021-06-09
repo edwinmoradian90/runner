@@ -16,7 +16,7 @@ A space shooter built with JavaScript! Just float around and shoot the asteroids
 
 ## Play
 
-[View Game](https://raw.githack.com/edwinmoradian90/runner/main/index.html)
+[Play Game](https://rawcdn.githack.com/edwinmoradian90/runner/0dcf6e34681a71ef9ddc1d63605e626c0b99f022/index.html)
 
 ## Contributions
 
