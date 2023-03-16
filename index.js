@@ -123,6 +123,18 @@ class Missile {
     );
   }
 
+  fire() {
+    if (e.key === "z") {
+      missiles.push(
+        new Missile(player.x + 10, player.y - 20, { x: 0, y: -40 }, "primary")
+      );
+      const missileFx = new Audio();
+      missileFx.src = "./assets/sfx/laser4.wav";
+      missileFx.currentTime = 0;
+      missileFx.play();
+    }
+  }
+
   update() {
     this.draw();
     this.x += this.velocity.x;
@@ -205,6 +217,16 @@ let keyPresses = {
   ArrowRight: false,
   z: false,
   x: false,
+};
+
+const MouseClick = {
+  LeftClick: 0,
+  RightClick: 2,
+};
+
+const mouseClicks = {
+  [MouseClick.LeftClick]: false,
+  [MouseClick.RightClick]: false,
 };
 
 let stars = [];
@@ -347,7 +369,8 @@ function movePlayer() {
         ? RUN_VELOCITY + accelerator / 4
         : 0;
   }
-  if (keyPresses["ArrowUp"]) {
+
+  if (keyPresses["ArrowUp"] || mouseClicks[MouseClick.RightClick]) {
     if (boost > 0) {
       accelerator += 1;
     } else {
@@ -360,6 +383,14 @@ function movePlayer() {
     }
   }
 }
+
+let previousMousePosition = 0;
+
+function movePlayerWithMouse(x) {
+  player.x = x < canvas.width ? x : player.x;
+  previousMousePosition = x;
+}
+
 let starInterval;
 function createStars() {
   starInterval = setInterval(() => {
@@ -486,30 +517,66 @@ function animate() {
   animationId = requestAnimationFrame(animate);
 }
 
+function fireMissile() {
+  missiles.push(
+    new Missile(player.x + 10, player.y - 20, { x: 0, y: -40 }, "primary")
+  );
+  const missileFx = new Audio();
+  missileFx.src = "./assets/sfx/laser4.wav";
+  missileFx.currentTime = 0;
+  missileFx.play();
+}
+
+function fireSecondary() {
+  missiles.push(
+    new Missile(player.x + 10, player.y - 20, { x: 0, y: -40 }, "secondary")
+  );
+  const rapidFireBeamFx = new Audio();
+  rapidFireBeamFx.src = "./assets/sfx/burstFire.mp3";
+  rapidFireBeamFx.currentTime = 0;
+  rapidFireBeamFx.play();
+}
+
 const engineSound = new Audio();
 engineSound.src = "./assets/sfx/engine1.wav";
+
+addEventListener("mousedown", (e) => {
+  e.preventDefault();
+  console.log(e.button);
+  if (e.button in mouseClicks) {
+    mouseClicks[e.button] = true;
+
+    if (e.button === MouseClick.RightClick && boost > 0) {
+      engineSound.play();
+    }
+
+    if (e.button === MouseClick.LeftClick) {
+      fireMissile();
+    }
+  }
+});
+
+addEventListener("mouseup", (e) => {
+  e.preventDefault();
+  console.log(e.button);
+  if (e.button in mouseClicks) {
+    mouseClicks[e.button] = false;
+
+    if (e.button === MouseClick.RightClick) {
+      accelerator = 0;
+      engineSound.currentTime = 0;
+      engineSound.pause();
+    }
+  }
+});
+
+addEventListener("mousemove", (e) => movePlayerWithMouse(e.clientX));
+
 addEventListener("keydown", (e) => {
-  if (e.key === "z") {
-    missiles.push(
-      new Missile(player.x + 10, player.y - 20, { x: 0, y: -40 }, "primary")
-    );
-    const missileFx = new Audio();
-    missileFx.src = "./assets/sfx/laser4.wav";
-    missileFx.currentTime = 0;
-    missileFx.play();
-  }
-  if (e.key === "ArrowUp" && boost > 0) {
-    engineSound.play();
-  }
-  if (e.key === "x") {
-    missiles.push(
-      new Missile(player.x + 10, player.y - 20, { x: 0, y: -40 }, "secondary")
-    );
-    const rapidFireBeamFx = new Audio();
-    rapidFireBeamFx.src = "./assets/sfx/burstFire.mp3";
-    rapidFireBeamFx.currentTime = 0;
-    rapidFireBeamFx.play();
-  }
+  if (e.key === "z") fireMissile();
+  if (e.key === "ArrowUp" && boost > 0) engineSound.play();
+  if (e.key === "x") fireSecondary();
+
   keyPresses[e.key] = true;
 });
 
