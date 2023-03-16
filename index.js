@@ -437,7 +437,11 @@ function animate() {
     missile.update();
   });
   stars.forEach((enemy) => {
-    enemy.update(keyPresses["ArrowUp"] ? accelerator : 0);
+    enemy.update(
+      keyPresses["ArrowUp"] || mouseClicks[MouseClick.RightClick]
+        ? accelerator
+        : 0
+    );
   });
   stars.forEach((enemy, index) => {
     if (enemy.y > canvas.height) {
@@ -542,7 +546,6 @@ engineSound.src = "./assets/sfx/engine1.wav";
 
 addEventListener("mousedown", (e) => {
   e.preventDefault();
-  console.log(e.button);
   if (e.button in mouseClicks) {
     mouseClicks[e.button] = true;
 
@@ -558,7 +561,6 @@ addEventListener("mousedown", (e) => {
 
 addEventListener("mouseup", (e) => {
   e.preventDefault();
-  console.log(e.button);
   if (e.button in mouseClicks) {
     mouseClicks[e.button] = false;
 
