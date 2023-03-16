@@ -10,15 +10,15 @@ No game over yet.
 
 ## Controls
 
-**Movement** Left and right arrow keys.
+**Movement** Left and right arrow keys OR mouse.
 
-**Shooting** Z and X keys. Z fires primary shots and X fires secondary shots.
+**Shooting** Z and X keys OR left click. Z and left click fire primary shots and X fires secondary shots.
 
-**Boost** Up arrow key to go faster.
+**Boost** Up arrow key or right click to go faster.
 
 ## Play
 
-[Play Game](https://rawcdn.githack.com/edwinmoradian90/runner/0dcf6e34681a71ef9ddc1d63605e626c0b99f022/index.html)
+[Play Game](https://raw.githack.com/edwinmoradian90/runner/main/index.html)
 
 ## Contributions
 
