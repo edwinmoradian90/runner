@@ -1,5 +1,8 @@
 'use strict';
 
+import Player from './src/player.js';
+import Asteroid from './src/asteroid.js';
+
 const canvas = document.querySelector('#canvas');
 const c = canvas.getContext('2d');
 const boostAmount = document.getElementById('boostAmount');
@@ -58,28 +61,6 @@ let boost = 100;
 let health = 100;
 let currentScore = 0;
 let counter = 0;
-
-class Player {
-  constructor(x, y, height, width, velocity, color) {
-    this.x = x;
-    this.y = y;
-    this.height = height;
-    this.width = width;
-    this.velocity = velocity;
-    this.color = color;
-  }
-
-  draw() {
-    c.beginPath();
-    c.drawImage(ship, this.x, this.y, 30, 60);
-  }
-
-  update() {
-    this.draw();
-    this.x += this.velocity.x;
-    this.y += this.velocity.y;
-  }
-}
 
 class Star {
   constructor(x, y, radius, velocity, color) {
@@ -160,27 +141,6 @@ class Heart {
   }
 }
 
-class Asteroid {
-  constructor(x, y, velocity, height, width) {
-    this.x = x;
-    this.y = y;
-    this.velocity = velocity;
-    this.height = height;
-    this.width = width;
-  }
-
-  draw() {
-    c.beginPath();
-    c.drawImage(asteroidBig, this.x, this.y, this.height, this.width);
-  }
-
-  update() {
-    this.draw();
-    this.x += this.velocity.x;
-    this.y += this.velocity.y + accelerator;
-  }
-}
-
 class Particle {
   constructor(x, y, velocity, color) {
     this.x = x;
@@ -242,7 +202,7 @@ const player = new Player(
   { x: 0, y: 0 },
   'red'
 );
-player.draw();
+player.draw(c);
 
 function stopPlayer() {
   player.velocity = { x: 0, y: 0 };
@@ -424,7 +384,7 @@ function animate() {
   counter += 1;
   c.fillStyle = 'rgba( 0, 0, 0, 0.7)';
   c.fillRect(0, 0, canvas.width, canvas.height);
-  player.update();
+  player.update(c);
   movePlayer();
   rechargeBoost();
   particles.forEach((particle, index) => {
@@ -464,7 +424,9 @@ function animate() {
       loseHealth();
     }
 
-    asteroid.update();
+    const data = { c, accelerator };
+
+    asteroid.update(data);
     missiles.forEach((missile, missileIndex) => {
       const dist = Math.hypot(missile.x - asteroid.x, missile.y - asteroid.y);
       if (dist - asteroid.height + 10 < 1) {
