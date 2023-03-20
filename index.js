@@ -3,6 +3,8 @@
 import Player from './src/player.js';
 import Asteroid from './src/asteroid.js';
 import Particle from './src/particle.js';
+import Star from './src/star.js';
+import { getRandomColor, random } from './src/utils.js';
 
 const canvas = document.querySelector('#canvas');
 const c = canvas.getContext('2d');
@@ -11,17 +13,6 @@ const boostGauge = document.getElementById('boostGauge');
 const healthAmount = document.getElementById('healthAmount');
 const healthGauge = document.getElementById('healthGauge');
 const score = document.getElementById('score');
-
-const random = (min, max) => Math.floor(Math.random() * (max - min)) + min;
-
-function getRandomColor() {
-  var letters = '0123456789ABCDEF';
-  var color = '#';
-  for (var i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-}
 
 const gameMusic = new Audio();
 gameMusic.src = './assets/music/OutThere.ogg';
@@ -62,29 +53,6 @@ let boost = 100;
 let health = 100;
 let currentScore = 0;
 let counter = 0;
-
-class Star {
-  constructor(x, y, radius, velocity, color) {
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
-    this.velocity = velocity;
-    this.color = color;
-  }
-
-  draw() {
-    c.beginPath();
-    c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, this.color, false);
-    c.fillStyle = this.color;
-    c.fill();
-  }
-
-  update(accelerator) {
-    this.draw();
-    this.x += this.velocity.x;
-    this.y += this.velocity.y + accelerator;
-  }
-}
 
 class Missile {
   constructor(x, y, velocity, type = 'primary') {
@@ -326,6 +294,8 @@ function movePlayerWithMouse(x) {
 let starInterval;
 function createStars() {
   starInterval = setInterval(() => {
+    const data = { c };
+
     const star = new Star(
       Math.random() * canvas.width,
       50,
@@ -333,7 +303,8 @@ function createStars() {
       { x: 0, y: 4 },
       `rgba(255, 255, 255, ${Math.random()})`
     );
-    star.draw();
+
+    star.draw(data);
     stars.push(star);
   }, 100);
 }
@@ -371,11 +342,14 @@ function animate() {
     missile.update();
   });
   stars.forEach((enemy) => {
-    enemy.update(
+    const data = { c };
+
+    data.accelerator =
       keyPresses['ArrowUp'] || mouseClicks[MouseClick.RightClick]
         ? accelerator
-        : 0
-    );
+        : 0;
+
+    enemy.update(data);
   });
   stars.forEach((enemy, index) => {
     if (enemy.y > canvas.height) {
