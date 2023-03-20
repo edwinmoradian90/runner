@@ -4,6 +4,7 @@ import Player from './src/player.js';
 import Asteroid from './src/asteroid.js';
 import Particle from './src/particle.js';
 import Star from './src/star.js';
+import Heart from './src/heart.js';
 import { getRandomColor, random } from './src/utils.js';
 
 const canvas = document.querySelector('#canvas');
@@ -89,24 +90,6 @@ class Missile {
     this.draw();
     this.x += this.velocity.x;
     this.y += this.velocity.y;
-  }
-}
-
-class Heart {
-  constructor(x, y, type) {
-    this.x = x;
-    this.y = y;
-    this.type = type;
-    this.healthGiven = 50;
-  }
-
-  draw() {
-    c.beginPath();
-    c.drawImage(heart, this.x, this.y);
-  }
-
-  update() {
-    this.draw();
   }
 }
 
