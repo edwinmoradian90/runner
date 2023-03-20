@@ -1,6 +1,7 @@
 'use strict';
 
 import Player from './src/player.js';
+import Missile from './src/missile.js';
 import Asteroid from './src/asteroid.js';
 import Particle from './src/particle.js';
 import Star from './src/star.js';
@@ -54,44 +55,6 @@ let boost = 100;
 let health = 100;
 let currentScore = 0;
 let counter = 0;
-
-class Missile {
-  constructor(x, y, velocity, type = 'primary') {
-    this.x = x;
-    this.y = y;
-    this.velocity = velocity;
-    this.type = type;
-  }
-
-  draw() {
-    c.beginPath();
-    c.drawImage(
-      this.type === 'primary' ? missile : rapidFireBeams,
-      this.x,
-      this.y,
-      10,
-      40
-    );
-  }
-
-  fire() {
-    if (e.key === 'z') {
-      missiles.push(
-        new Missile(player.x + 10, player.y - 20, { x: 0, y: -40 }, 'primary')
-      );
-      const missileFx = new Audio();
-      missileFx.src = './assets/sfx/laser4.wav';
-      missileFx.currentTime = 0;
-      missileFx.play();
-    }
-  }
-
-  update() {
-    this.draw();
-    this.x += this.velocity.x;
-    this.y += this.velocity.y;
-  }
-}
 
 let keyPresses = {
   ArrowUp: false,
@@ -308,11 +271,14 @@ function animate() {
   }
 
   counter += 1;
+
   c.fillStyle = 'rgba( 0, 0, 0, 0.7)';
   c.fillRect(0, 0, canvas.width, canvas.height);
+
   player.update(c);
   movePlayer();
   rechargeBoost();
+
   particles.forEach((particle, index) => {
     if (particle.alpha <= 0) {
       particles.splice(index, 1);
@@ -321,9 +287,9 @@ function animate() {
       particle.update(data);
     }
   });
-  missiles.forEach((missile) => {
-    missile.update();
-  });
+
+  missiles.forEach((missile) => missile.update({ c }));
+
   stars.forEach((enemy) => {
     const data = { c };
 
@@ -334,6 +300,7 @@ function animate() {
 
     enemy.update(data);
   });
+
   stars.forEach((enemy, index) => {
     if (enemy.y > canvas.height) {
       setTimeout(() => {
@@ -341,11 +308,13 @@ function animate() {
       }, 0);
     }
   });
+
   asteroids.forEach((asteroid, index) => {
     const playerAstroDist = Math.hypot(
       player.x - asteroid.x,
       player.y - asteroid.y
     );
+
     if (playerAstroDist - asteroid.height < 1) {
       collisionSound.currentTime = 0;
       collisionSound.play();
@@ -357,6 +326,7 @@ function animate() {
     const data = { c, accelerator };
 
     asteroid.update(data);
+
     missiles.forEach((missile, missileIndex) => {
       const dist = Math.hypot(missile.x - asteroid.x, missile.y - asteroid.y);
       if (dist - asteroid.height + 10 < 1) {
