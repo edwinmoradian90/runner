@@ -2,6 +2,7 @@
 
 import Player from './src/player.js';
 import Asteroid from './src/asteroid.js';
+import Particle from './src/particle.js';
 
 const canvas = document.querySelector('#canvas');
 const c = canvas.getContext('2d');
@@ -55,7 +56,7 @@ canvas.width = 800;
 canvas.height = 600;
 
 const RUN_VELOCITY = 5;
-const FRICTION = 0.92;
+const friction = 0.92;
 let accelerator = 0;
 let boost = 100;
 let health = 100;
@@ -138,35 +139,6 @@ class Heart {
 
   update() {
     this.draw();
-  }
-}
-
-class Particle {
-  constructor(x, y, velocity, color) {
-    this.x = x;
-    this.y = y;
-    this.velocity = velocity;
-    this.color = color;
-    this.alpha = 1;
-  }
-
-  draw() {
-    c.save();
-    c.globalAlpha = this.alpha;
-    c.beginPath();
-    c.fillStyle = this.color || 'white';
-    c.arc(this.x, this.y, random(0, 3), 0, 2 * Math.PI, false);
-    c.fill();
-    c.restore();
-  }
-
-  update() {
-    this.draw();
-    this.velocity.x *= FRICTION;
-    this.velocity.y *= FRICTION;
-    this.x += this.velocity.x;
-    this.y += this.velocity.y + accelerator;
-    this.alpha -= 0.01;
   }
 }
 
@@ -391,7 +363,8 @@ function animate() {
     if (particle.alpha <= 0) {
       particles.splice(index, 1);
     } else {
-      particle.update();
+      const data = { c, accelerator, friction };
+      particle.update(data);
     }
   });
   missiles.forEach((missile) => {
@@ -420,7 +393,7 @@ function animate() {
       collisionSound.currentTime = 0;
       collisionSound.play();
       asteroid.velocity.x = player.velocity.x;
-      asteroid.velocity.y = player.velocity.y - FRICTION - accelerator;
+      asteroid.velocity.y = player.velocity.y - friction - accelerator;
       loseHealth();
     }
 
