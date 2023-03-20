@@ -408,18 +408,19 @@ function createStars() {
 
 let animationId;
 
-function endGame() {
-  cancelAnimationFrame(animationId);
-  clearInterval(starInterval);
-}
-
 function addToScore(asteroidHeight) {
   currentScore += Math.floor(10 + asteroidHeight / 2);
   score.innerHTML = currentScore;
 }
 
 function animate() {
-  if (health <= 0) return endGame();
+  if (health <= 0) {
+    currentScore = 0;
+    counter = 0;
+    health = 100;
+    score.innerHTML = currentScore;
+  }
+
   counter += 1;
   c.fillStyle = 'rgba( 0, 0, 0, 0.7)';
   c.fillRect(0, 0, canvas.width, canvas.height);
