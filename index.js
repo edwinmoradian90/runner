@@ -10,8 +10,6 @@ import { getRandomColor, random } from './src/utils.js';
 
 const canvas = document.querySelector('#canvas');
 const c = canvas.getContext('2d');
-const boostAmount = document.getElementById('boostAmount');
-const boostGauge = document.getElementById('boostGauge');
 const healthAmount = document.getElementById('healthAmount');
 const healthGauge = document.getElementById('healthGauge');
 const score = document.getElementById('score');
@@ -23,21 +21,6 @@ gameMusic.play();
 
 const missileFx = new Audio();
 missileFx.src = './assets/sfx/laser4.wav';
-
-const ship = new Image();
-ship.src = './assets/sprites/Fighter3.png';
-
-const heart = new Image();
-heart.src = './assets/sprites/heart.png';
-
-const missile = new Image();
-missile.src = './assets/sprites/beams.png';
-
-const rapidFireBeams = new Image();
-rapidFireBeams.src = './assets/sprites/beamRapid.png';
-
-const asteroidBig = new Image();
-asteroidBig.src = './assets/sprites/asteriod-big.png';
 
 const collisionSound = new Audio();
 collisionSound.src = './assets/sfx/flaunch.wav';
@@ -51,10 +34,9 @@ canvas.height = 600;
 const RUN_VELOCITY = 5;
 const friction = 0.92;
 let accelerator = 0;
-let boost = 100;
 let health = 100;
 let currentScore = 0;
-let counter = 0;
+let frame = 0;
 
 let keyPresses = {
   ArrowUp: false,
@@ -88,7 +70,8 @@ const player = new Player(
   { x: 0, y: 0 },
   'red'
 );
-player.draw(c);
+
+player.draw({ c, frame });
 
 function stopPlayer() {
   player.velocity = { x: 0, y: 0 };
@@ -112,65 +95,10 @@ function createAsteroids() {
   }, 2000);
 }
 
-function useBoost() {
-  boost = boost - 1;
-  boostAmount.innerHTML = boost;
-  boostGauge.style.width = boost + 'px';
-  if (boost < 5) {
-    if (counter % 70 === 0) {
-      boostGauge.style.background = 'red';
-    }
-  } else if (boost < 25) {
-    if (counter % 15 === 0) {
-      boostGauge.style.background = 'orange';
-    }
-  } else if (boost < 50) {
-    if (counter % 10 === 0) {
-      boostGauge.style.background = 'yellow';
-    }
-  } else if (boost < 100) {
-    if (counter % 5 === 0) {
-      boostGauge.style.background = 'green';
-    }
-  }
-}
-
-function rechargeBoost() {
-  if (boost < 5) {
-    if (counter % 70 === 0) {
-      boost += 1;
-      boostAmount.innerHTML = boost;
-      boostGauge.style.width = boost + 'px';
-      boostGauge.style.background = 'red';
-    }
-  } else if (boost < 25) {
-    if (counter % 15 === 0) {
-      boost += 1;
-      boostAmount.innerHTML = boost;
-      boostGauge.style.width = boost + 'px';
-      boostGauge.style.background = 'orange';
-    }
-  } else if (boost < 50) {
-    if (counter % 10 === 0) {
-      boost += 1;
-      boostAmount.innerHTML = boost;
-      boostGauge.style.width = boost + 'px';
-      boostGauge.style.background = 'yellow';
-    }
-  } else if (boost < 100) {
-    if (counter % 5 === 0) {
-      boost += 1;
-      boostAmount.innerHTML = boost;
-      boostGauge.style.width = boost + 'px';
-      boostGauge.style.background = 'green';
-    }
-  }
-}
-
 function loseHealth() {
   if (health <= 10) {
     healthGauge.style.background = 'red';
-    if (counter % 1 === 0) {
+    if (frame % 1 === 0) {
       if (health - 4 < 0) {
         health = 0;
       } else {
@@ -181,21 +109,21 @@ function loseHealth() {
     }
   } else if (health < 25) {
     healthGauge.style.background = 'orange';
-    if (counter % 1 === 0) {
+    if (frame % 1 === 0) {
       health -= 3;
       healthAmount.innerHTML = health;
       healthGauge.style.width = health + 'px';
     }
   } else if (health < 50) {
     healthGauge.style.background = 'yellow';
-    if (counter % 2 === 0) {
+    if (frame % 2 === 0) {
       health -= 2;
       healthAmount.innerHTML = health;
       healthGauge.style.width = health + 'px';
     }
   } else if (health <= 100) {
     healthGauge.style.background = 'green';
-    if (counter % 2 === 0) {
+    if (frame % 2 === 0) {
       health -= 2;
       healthAmount.innerHTML = health;
       healthGauge.style.width = health + 'px';
@@ -217,15 +145,17 @@ function movePlayer() {
   }
 
   if (keyPresses['ArrowUp'] || mouseClicks[MouseClick.RightClick]) {
-    if (boost > 0) {
+    if (player.boostRemaining > 0) {
       accelerator += 1;
+      player.isBoosting = true;
     } else {
+      player.isBoosting = false;
       accelerator > 0 ? (accelerator -= 5) : 0;
       errorSound.currentTime = 0;
       errorSound.play();
     }
-    if (accelerator > 7 && boost > 0) {
-      useBoost();
+    if (accelerator > 7 && player.boostRemaining > 0) {
+      player.useBoost({ frame });
     }
   }
 }
@@ -265,19 +195,18 @@ function addToScore(asteroidHeight) {
 function animate() {
   if (health <= 0) {
     currentScore = 0;
-    counter = 0;
+    frame = 0;
     health = 100;
     score.innerHTML = currentScore;
   }
 
-  counter += 1;
+  frame += 1;
 
   c.fillStyle = 'rgba( 0, 0, 0, 0.7)';
   c.fillRect(0, 0, canvas.width, canvas.height);
 
-  player.update(c);
+  player.update({ c, frame });
   movePlayer();
-  rechargeBoost();
 
   particles.forEach((particle, index) => {
     if (particle.alpha <= 0) {
@@ -412,7 +341,8 @@ addEventListener('mousedown', (e) => {
   if (e.button in mouseClicks) {
     mouseClicks[e.button] = true;
 
-    if (e.button === MouseClick.RightClick && boost > 0) {
+    if (e.button === MouseClick.RightClick && player.boostRemaining > 0) {
+      player.isBoosting = true;
       engineSound.play();
     }
 
@@ -428,18 +358,18 @@ addEventListener('mouseup', (e) => {
     mouseClicks[e.button] = false;
 
     if (e.button === MouseClick.RightClick) {
+      player.isBoosting = false;
       accelerator = 0;
       engineSound.currentTime = 0;
       engineSound.pause();
     }
   }
 });
-
 addEventListener('mousemove', (e) => movePlayerWithMouse(e.clientX));
 
 addEventListener('keydown', (e) => {
   if (e.key === 'z') fireMissile();
-  if (e.key === 'ArrowUp' && boost > 0) engineSound.play();
+  if (e.key === 'ArrowUp' && player.boostRemaining > 0) engineSound.play();
   if (e.key === 'x') fireSecondary();
 
   keyPresses[e.key] = true;

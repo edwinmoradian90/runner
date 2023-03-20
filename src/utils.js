@@ -9,3 +9,10 @@ export const getRandomColor = () => {
   }
   return color;
 };
+
+export const Colors = {
+  Green: 'green',
+  Orange: 'orange',
+  Red: 'red',
+  Yellow: 'yellow',
+};
