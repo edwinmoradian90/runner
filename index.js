@@ -1,18 +1,18 @@
-"use strict";
+'use strict';
 
-const canvas = document.querySelector("#canvas");
-const c = canvas.getContext("2d");
-const boostAmount = document.getElementById("boostAmount");
-const boostGauge = document.getElementById("boostGauge");
-const healthAmount = document.getElementById("healthAmount");
-const healthGauge = document.getElementById("healthGauge");
-const score = document.getElementById("score");
+const canvas = document.querySelector('#canvas');
+const c = canvas.getContext('2d');
+const boostAmount = document.getElementById('boostAmount');
+const boostGauge = document.getElementById('boostGauge');
+const healthAmount = document.getElementById('healthAmount');
+const healthGauge = document.getElementById('healthGauge');
+const score = document.getElementById('score');
 
 const random = (min, max) => Math.floor(Math.random() * (max - min)) + min;
 
 function getRandomColor() {
-  var letters = "0123456789ABCDEF";
-  var color = "#";
+  var letters = '0123456789ABCDEF';
+  var color = '#';
   for (var i = 0; i < 6; i++) {
     color += letters[Math.floor(Math.random() * 16)];
   }
@@ -20,33 +20,33 @@ function getRandomColor() {
 }
 
 const gameMusic = new Audio();
-gameMusic.src = "./assets/music/OutThere.ogg";
+gameMusic.src = './assets/music/OutThere.ogg';
 gameMusic.loop = true;
 gameMusic.play();
 
 const missileFx = new Audio();
-missileFx.src = "./assets/sfx/laser4.wav";
+missileFx.src = './assets/sfx/laser4.wav';
 
 const ship = new Image();
-ship.src = "./assets/sprites/Fighter3.png";
+ship.src = './assets/sprites/Fighter3.png';
 
 const heart = new Image();
-heart.src = "./assets/sprites/heart.png";
+heart.src = './assets/sprites/heart.png';
 
 const missile = new Image();
-missile.src = "./assets/sprites/beams.png";
+missile.src = './assets/sprites/beams.png';
 
 const rapidFireBeams = new Image();
-rapidFireBeams.src = "./assets/sprites/beamRapid.png";
+rapidFireBeams.src = './assets/sprites/beamRapid.png';
 
 const asteroidBig = new Image();
-asteroidBig.src = "./assets/sprites/asteriod-big.png";
+asteroidBig.src = './assets/sprites/asteriod-big.png';
 
 const collisionSound = new Audio();
-collisionSound.src = "./assets/sfx/flaunch.wav";
+collisionSound.src = './assets/sfx/flaunch.wav';
 
 const errorSound = new Audio();
-errorSound.src = "./assets/sfx/error.ogg";
+errorSound.src = './assets/sfx/error.ogg';
 
 canvas.width = 800;
 canvas.height = 600;
@@ -105,7 +105,7 @@ class Star {
 }
 
 class Missile {
-  constructor(x, y, velocity, type = "primary") {
+  constructor(x, y, velocity, type = 'primary') {
     this.x = x;
     this.y = y;
     this.velocity = velocity;
@@ -115,7 +115,7 @@ class Missile {
   draw() {
     c.beginPath();
     c.drawImage(
-      this.type === "primary" ? missile : rapidFireBeams,
+      this.type === 'primary' ? missile : rapidFireBeams,
       this.x,
       this.y,
       10,
@@ -124,12 +124,12 @@ class Missile {
   }
 
   fire() {
-    if (e.key === "z") {
+    if (e.key === 'z') {
       missiles.push(
-        new Missile(player.x + 10, player.y - 20, { x: 0, y: -40 }, "primary")
+        new Missile(player.x + 10, player.y - 20, { x: 0, y: -40 }, 'primary')
       );
       const missileFx = new Audio();
-      missileFx.src = "./assets/sfx/laser4.wav";
+      missileFx.src = './assets/sfx/laser4.wav';
       missileFx.currentTime = 0;
       missileFx.play();
     }
@@ -194,7 +194,7 @@ class Particle {
     c.save();
     c.globalAlpha = this.alpha;
     c.beginPath();
-    c.fillStyle = this.color || "white";
+    c.fillStyle = this.color || 'white';
     c.arc(this.x, this.y, random(0, 3), 0, 2 * Math.PI, false);
     c.fill();
     c.restore();
@@ -240,7 +240,7 @@ const player = new Player(
   50,
   50,
   { x: 0, y: 0 },
-  "red"
+  'red'
 );
 player.draw();
 
@@ -269,22 +269,22 @@ function createAsteroids() {
 function useBoost() {
   boost = boost - 1;
   boostAmount.innerHTML = boost;
-  boostGauge.style.width = boost + "px";
+  boostGauge.style.width = boost + 'px';
   if (boost < 5) {
     if (counter % 70 === 0) {
-      boostGauge.style.background = "red";
+      boostGauge.style.background = 'red';
     }
   } else if (boost < 25) {
     if (counter % 15 === 0) {
-      boostGauge.style.background = "orange";
+      boostGauge.style.background = 'orange';
     }
   } else if (boost < 50) {
     if (counter % 10 === 0) {
-      boostGauge.style.background = "yellow";
+      boostGauge.style.background = 'yellow';
     }
   } else if (boost < 100) {
     if (counter % 5 === 0) {
-      boostGauge.style.background = "green";
+      boostGauge.style.background = 'green';
     }
   }
 }
@@ -294,36 +294,36 @@ function rechargeBoost() {
     if (counter % 70 === 0) {
       boost += 1;
       boostAmount.innerHTML = boost;
-      boostGauge.style.width = boost + "px";
-      boostGauge.style.background = "red";
+      boostGauge.style.width = boost + 'px';
+      boostGauge.style.background = 'red';
     }
   } else if (boost < 25) {
     if (counter % 15 === 0) {
       boost += 1;
       boostAmount.innerHTML = boost;
-      boostGauge.style.width = boost + "px";
-      boostGauge.style.background = "orange";
+      boostGauge.style.width = boost + 'px';
+      boostGauge.style.background = 'orange';
     }
   } else if (boost < 50) {
     if (counter % 10 === 0) {
       boost += 1;
       boostAmount.innerHTML = boost;
-      boostGauge.style.width = boost + "px";
-      boostGauge.style.background = "yellow";
+      boostGauge.style.width = boost + 'px';
+      boostGauge.style.background = 'yellow';
     }
   } else if (boost < 100) {
     if (counter % 5 === 0) {
       boost += 1;
       boostAmount.innerHTML = boost;
-      boostGauge.style.width = boost + "px";
-      boostGauge.style.background = "green";
+      boostGauge.style.width = boost + 'px';
+      boostGauge.style.background = 'green';
     }
   }
 }
 
 function loseHealth() {
   if (health <= 10) {
-    healthGauge.style.background = "red";
+    healthGauge.style.background = 'red';
     if (counter % 1 === 0) {
       if (health - 4 < 0) {
         health = 0;
@@ -331,46 +331,46 @@ function loseHealth() {
         health -= 4;
       }
       healthAmount.innerHTML = health;
-      healthGauge.style.width = health + "px";
+      healthGauge.style.width = health + 'px';
     }
   } else if (health < 25) {
-    healthGauge.style.background = "orange";
+    healthGauge.style.background = 'orange';
     if (counter % 1 === 0) {
       health -= 3;
       healthAmount.innerHTML = health;
-      healthGauge.style.width = health + "px";
+      healthGauge.style.width = health + 'px';
     }
   } else if (health < 50) {
-    healthGauge.style.background = "yellow";
+    healthGauge.style.background = 'yellow';
     if (counter % 2 === 0) {
       health -= 2;
       healthAmount.innerHTML = health;
-      healthGauge.style.width = health + "px";
+      healthGauge.style.width = health + 'px';
     }
   } else if (health <= 100) {
-    healthGauge.style.background = "green";
+    healthGauge.style.background = 'green';
     if (counter % 2 === 0) {
       health -= 2;
       healthAmount.innerHTML = health;
-      healthGauge.style.width = health + "px";
+      healthGauge.style.width = health + 'px';
     }
   }
 }
 
 function movePlayer() {
   stopPlayer();
-  if (keyPresses["ArrowLeft"]) {
+  if (keyPresses['ArrowLeft']) {
     player.velocity.x =
       player.x - player.width > 0 ? -RUN_VELOCITY - accelerator / 4 : 0;
   }
-  if (keyPresses["ArrowRight"]) {
+  if (keyPresses['ArrowRight']) {
     player.velocity.x =
       player.x + player.height * 2 < canvas.width
         ? RUN_VELOCITY + accelerator / 4
         : 0;
   }
 
-  if (keyPresses["ArrowUp"] || mouseClicks[MouseClick.RightClick]) {
+  if (keyPresses['ArrowUp'] || mouseClicks[MouseClick.RightClick]) {
     if (boost > 0) {
       accelerator += 1;
     } else {
@@ -421,7 +421,7 @@ function addToScore(asteroidHeight) {
 function animate() {
   if (health <= 0) return endGame();
   counter += 1;
-  c.fillStyle = "rgba( 0, 0, 0, 0.7)";
+  c.fillStyle = 'rgba( 0, 0, 0, 0.7)';
   c.fillRect(0, 0, canvas.width, canvas.height);
   player.update();
   movePlayer();
@@ -438,7 +438,7 @@ function animate() {
   });
   stars.forEach((enemy) => {
     enemy.update(
-      keyPresses["ArrowUp"] || mouseClicks[MouseClick.RightClick]
+      keyPresses['ArrowUp'] || mouseClicks[MouseClick.RightClick]
         ? accelerator
         : 0
     );
@@ -471,7 +471,7 @@ function animate() {
           missiles.splice(missileIndex, 1);
           if (asteroid.height < 70) {
             const asteroidExplosionSound = new Audio();
-            asteroidExplosionSound.src = "./iceball.wav";
+            asteroidExplosionSound.src = './assets/sfx/iceball.wav';
             asteroidExplosionSound.currentTime = 0;
             asteroidExplosionSound.play();
             asteroids.splice(index, 1);
@@ -490,13 +490,13 @@ function animate() {
               );
             }
           } else {
-            if (missile.type === "primary") {
+            if (missile.type === 'primary') {
               gsap.to(asteroid, {
                 height: asteroid.height - 20,
                 width: asteroid.width - 20,
               });
             } else {
-              const newHeart = new Heart(asteroid.x, asteroid.y, "mega");
+              const newHeart = new Heart(asteroid.x, asteroid.y, 'mega');
               asteroids.splice(index, 1);
               newHeart.update();
             }
@@ -523,28 +523,28 @@ function animate() {
 
 function fireMissile() {
   missiles.push(
-    new Missile(player.x + 10, player.y - 20, { x: 0, y: -40 }, "primary")
+    new Missile(player.x + 10, player.y - 20, { x: 0, y: -40 }, 'primary')
   );
   const missileFx = new Audio();
-  missileFx.src = "./assets/sfx/laser4.wav";
+  missileFx.src = './assets/sfx/laser4.wav';
   missileFx.currentTime = 0;
   missileFx.play();
 }
 
 function fireSecondary() {
   missiles.push(
-    new Missile(player.x + 10, player.y - 20, { x: 0, y: -40 }, "secondary")
+    new Missile(player.x + 10, player.y - 20, { x: 0, y: -40 }, 'secondary')
   );
   const rapidFireBeamFx = new Audio();
-  rapidFireBeamFx.src = "./assets/sfx/burstFire.mp3";
+  rapidFireBeamFx.src = './assets/sfx/burstFire.mp3';
   rapidFireBeamFx.currentTime = 0;
   rapidFireBeamFx.play();
 }
 
 const engineSound = new Audio();
-engineSound.src = "./assets/sfx/engine1.wav";
+engineSound.src = './assets/sfx/engine1.wav';
 
-addEventListener("mousedown", (e) => {
+addEventListener('mousedown', (e) => {
   e.preventDefault();
   if (e.button in mouseClicks) {
     mouseClicks[e.button] = true;
@@ -559,7 +559,7 @@ addEventListener("mousedown", (e) => {
   }
 });
 
-addEventListener("mouseup", (e) => {
+addEventListener('mouseup', (e) => {
   e.preventDefault();
   if (e.button in mouseClicks) {
     mouseClicks[e.button] = false;
@@ -572,18 +572,18 @@ addEventListener("mouseup", (e) => {
   }
 });
 
-addEventListener("mousemove", (e) => movePlayerWithMouse(e.clientX));
+addEventListener('mousemove', (e) => movePlayerWithMouse(e.clientX));
 
-addEventListener("keydown", (e) => {
-  if (e.key === "z") fireMissile();
-  if (e.key === "ArrowUp" && boost > 0) engineSound.play();
-  if (e.key === "x") fireSecondary();
+addEventListener('keydown', (e) => {
+  if (e.key === 'z') fireMissile();
+  if (e.key === 'ArrowUp' && boost > 0) engineSound.play();
+  if (e.key === 'x') fireSecondary();
 
   keyPresses[e.key] = true;
 });
 
-addEventListener("keyup", (e) => {
-  if (e.key === "ArrowUp") {
+addEventListener('keyup', (e) => {
+  if (e.key === 'ArrowUp') {
     accelerator = 0;
     engineSound.currentTime = 0;
     engineSound.pause();
