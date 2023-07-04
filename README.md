@@ -18,7 +18,7 @@ No game over yet.
 
 ## Play
 
-[Play Game](https://raw.githack.com/edwinmoradian90/runner/main/index.html)
+[Play Game](https://spacey-space-space.netlify.app/)
 
 ## Contributions
 
