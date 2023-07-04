@@ -28,9 +28,7 @@ const spriteList = [
   },
 ];
 
-const sprites = spriteList.reduce((acc, sprite) => {
+export const sprites = spriteList.reduce((acc, sprite) => {
   acc[sprite.name] = getSprite(sprite.filename);
   return acc;
 }, {});
-
-return sprites;
