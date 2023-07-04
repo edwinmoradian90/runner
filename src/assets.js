@@ -1,3 +1,10 @@
+const getSprite = (filename) => {
+  const sprite = new Image();
+  sprite.src = `../assets/sprites/${filename}`;
+
+  return sprite;
+};
+
 const spriteList = [
   {
     name: 'ship',
@@ -21,15 +28,9 @@ const spriteList = [
   },
 ];
 
-const getSprite = (filename) => {
-  const sprite = new Image();
-  sprite.src = `../assets/sprites/${filename}`;
+const sprites = spriteList.reduce((acc, sprite) => {
+  acc[sprite.name] = getSprite(sprite.filename);
+  return acc;
+}, {});
 
-  return sprite;
-};
-
-export const sprites = {};
-
-spriteList.forEach(
-  (sprite) => (sprites[sprite.name] = getSprite(sprite.filename))
-);
+return sprites;
