@@ -31,7 +31,7 @@ errorSound.src = './assets/sfx/error.ogg';
 canvas.width = 800;
 canvas.height = 600;
 
-const RUN_VELOCITY = 5;
+const RUN_VELOCITY = 20;
 const friction = 0.92;
 let accelerator = 0;
 let health = 100;
@@ -86,13 +86,13 @@ function createAsteroids() {
         -70,
         {
           x: 0,
-          y: Math.random() * 4,
+          y: Math.random() * RUN_VELOCITY,
         },
         randomNumber,
         randomNumber
       )
     );
-  }, 2000);
+  }, 500);
 }
 
 function loseHealth() {
@@ -176,7 +176,7 @@ function createStars() {
       Math.random() * canvas.width,
       50,
       Math.random() * 2,
-      { x: 0, y: 4 },
+      { x: 0, y: RUN_VELOCITY },
       `rgba(255, 255, 255, ${Math.random()})`
     );
 
@@ -212,7 +212,12 @@ function animate() {
     if (particle.alpha <= 0) {
       particles.splice(index, 1);
     } else {
-      const data = { c, accelerator, friction };
+      const data = {
+        c,
+        accelerator,
+        friction,
+        runVelocity: RUN_VELOCITY / 4,
+      };
       particle.update(data);
     }
   });
@@ -272,7 +277,7 @@ function animate() {
               particles.push(
                 new Particle(
                   asteroid.x + asteroid.width / 2,
-                  asteroid.y + asteroid.height / 2,
+                  asteroid.y + asteroid.height / 2 + RUN_VELOCITY,
                   {
                     x: (Math.random() - 0.5) * (Math.random() * 13),
                     y: (Math.random() - 0.5) * (Math.random() * 13),
@@ -290,7 +295,7 @@ function animate() {
             } else {
               const newHeart = new Heart(asteroid.x, asteroid.y, 'mega');
               asteroids.splice(index, 1);
-              newHeart.update();
+              newHeart.update({ c });
             }
           }
         }, 0);

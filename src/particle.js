@@ -22,13 +22,13 @@ export default class Particle {
   }
 
   update(data) {
-    const { friction, accelerator } = data;
+    const { friction, runVelocity, accelerator } = data;
 
     this.draw(data);
     this.velocity.x *= friction;
     this.velocity.y *= friction;
     this.x += this.velocity.x;
-    this.y += this.velocity.y + accelerator;
+    this.y += this.velocity.y + runVelocity + accelerator;
     this.alpha -= 0.01;
   }
 }
